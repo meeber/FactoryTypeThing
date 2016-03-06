@@ -155,6 +155,7 @@ let nastyDinnerable = factory.create("Dinnerable", {
 
 # Beware
 
+* Requires Node v5.0.0 or higher (or heavy transpiling)
 * If using UglifyJS, then either use its --keep-fnames switch or only use register(Class|Factory|Singleton) override functions instead of register.
 * Circular dependencies will overflow the stack.
 * Overriding a dependency won't propogate the override to dependencies-of-dependencies.
