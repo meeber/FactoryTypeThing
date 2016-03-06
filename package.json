@@ -1,13 +1,13 @@
 {
   "name": "factory-tt",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "factory-type-thing and dependency manager",
   "author": "Grant Snodgrass <meeber@gametypething.com>",
   "license": "MIT",
   "repository": "meeber/factory-tt",
   "main": "dist/factory.js",
-  "engines" : {
-    "node" : ">=5.0.0"
+  "engines": {
+    "node": ">=5.0.0"
   },
   "dependencies": {
     "lodash": "^4.6.1"
