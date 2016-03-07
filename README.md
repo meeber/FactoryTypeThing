@@ -1,8 +1,8 @@
-# Overview
+# FactoryTypeThing
 
-factory-tt is a JavaScript factory-type-thing and dependency manager.
+JavaScript object creator and dependency manager.
 
-Register all of your classes and/or factory functions (as well as their dependencies) at the start of your application, and then inject factory into any object that needs to instantiate other objects.
+Register all of your classes and/or factory functions (as well as their dependencies) at the start of your application, and then inject the factory into any object that needs to instantiate other objects.
 
 # Install
 
@@ -62,35 +62,36 @@ let wheatCracker2 = factory.create("wHeAtCrAcKeR");
 Work with a singleton:
 
 ```js
-// A singleton object
+// A singleton object; 'register' won't know what to do with this
 var pudding = {hasSprinkes: true};
 
-// Use registerSingleton because factory-tt can't auto-detect type/name
+// Use 'registerSingleton' instead; must provide a name as first parameter
 factory.registerSingleton("Pudding", pudding);
+
+// Although it doesn't have to be the same name as the variable
+factory.registerSingleton("Goop", pudding);
 
 // There's only one pudding (returns the same object it was given):
 let pudding1 = factory.create("Pudding");
 let pudding2 = factory.create("pUdDiNg");
-pudding1 === pudding2;
+let goop = factory.create("Goop");
+pudding1 === pudding2 === goop;
 ```
 
 Override register's type detection and/or naming:
 
 ```js
-// Class starts with lowercase so factory-tt thinks it's a factory function
+// Class starts with lowercase so 'register' thinks it's a factory function
 class poorlyNamedClass {}
 
-// Use registerClass to force it to be registered as a class instead
-factory.registerClass("PoorlyNamedClass", poorlyNamedClass);
+// Use 'registerClass' instead to force it to be registered as a class
+factory.registerClass("MyClass", poorlyNamedClass);
 
-// Factory function starts with uppercase so factory-tt thinks it's a class
+// Factory function starts with uppercase so 'register' thinks it's a class
 function PoorlyNamedFactory() {}
 
-// Use registerFactory to force it to be registered as a factory instead
-factory.registerFactory("poorlyNamedFactory", PoorlyNamedFactory);
-
-// Can also use override functions to customize registration name
-factory.registerSingleton("Goop", pudding);
+// Use 'registerFactory' instead to force it to be registered as a factory
+factory.registerFactory("MyFactory", PoorlyNamedFactory);
 ```
 
 Define dependencies for a constructor that accepts positional parameters:
