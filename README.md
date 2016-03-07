@@ -1,8 +1,8 @@
-# Overview
+# FactoryTypeThing
 
-factory-tt is a JavaScript factory-type-thing and dependency manager.
+JavaScript object creator and dependency manager.
 
-Register all of your classes and/or factory functions (as well as their dependencies) at the start of your application, and then inject factory into any object that needs to instantiate other objects.
+Register all of your classes and/or factory functions (as well as their dependencies) at the start of your application, and then inject the factory into any object that needs to instantiate other objects.
 
 # Install
 
@@ -23,86 +23,89 @@ let factory = createFactory();
 Work with a traditional constructor:
 
 ```js
-// Some traditional constructor function (starting with an uppercase letter):
+// Constructor function (must start uppercase)
 function Turkey() { this.texture = "juicy"; }
 
-// Register the traditional constructor function with the factory:
+// Register the constructor with the factory
 factory.register(Turkey);
 
-// Now instantiate some delicious turkey (it knows to call "new"):
+// Instantiate some delicious case insensitive turkey (it knows to call "new")
 let turkey1 = factory.create("Turkey");
-let turkey2 = factory.create("Turkey");
+let turkey2 = factory.create("tUrKeY");
 ```
 
 Work with an ES6 class:
 
 ```js
-// An ES6 class (again starting with an uppercase letter):
+// ES6 class (must start uppercase)
 class Cheddar { constructor() { this.flavorRating = 42; } }
 
 factory.register(Cheddar);
 
 let cheddar1 = factory.create("Cheddar");
-let cheddar2 = factory.create("Cheddar");
+let cheddar2 = factory.create("cHeDdAr");
 ```
 
 Work with a factory function:
 
 ```js
-// A factory function (starting with a lowercase letter):
+// Factory function (must start lowercase)
 function wheatCracker() { return {numHoles: 7}; }
 
 factory.register(wheatCracker);
 
-// Mmm crackertime (it knows not to call "new"):
-let wheatCracker1 = factory.create("wheatCracker");
-let wheatCracker2 = factory.create("wheatCracker");
+// Mmm crackertime (it knows not to call "new")
+let wheatCracker1 = factory.create("WheatCracker");
+let wheatCracker2 = factory.create("wHeAtCrAcKeR");
 ```
 
 Work with a singleton:
 
 ```js
-// A singleton object
+// A singleton object; 'register' won't know what to do with this
 var pudding = {hasSprinkes: true};
 
-// Use registerSingleton instead of register because it can't auto-detect name
-factory.registerSingleton("pudding", pudding);
+// Use 'registerSingleton' instead; must provide a name as first parameter
+factory.registerSingleton("Pudding", pudding);
 
-// There's only one pudding (it just returns the same object it was given):
-let pudding1 = factory.create("pudding");
-let pudding2 = factory.create("pudding");
+// Although it doesn't have to be the same name as the variable
+factory.registerSingleton("Goop", pudding);
+
+// All puddings are equal (returns the same object every time)
+let pudding1 = factory.create("Pudding");
+let pudding2 = factory.create("pUdDiNg");
 pudding1 === pudding2;
 ```
 
-Override register's type detection and naming:
+Override register's type detection and/or naming:
 
 ```js
-// Use registerClass instead of register because it thinks it's a factoryFn
-class poorlyNamedClass { construct() {} }
-factory.registerClass("PoorlyNamedClass", poorlyNamedClass);
+// Class starts with lowercase so 'register' thinks it's a factory function
+class poorlyNamedClass {}
 
-// Use registerFactory instead of register because it thinks it's a class
+// Use 'registerClass' instead to force it to be registered as a class
+factory.registerClass("MyClass", poorlyNamedClass);
+
+// Factory function starts with uppercase so 'register' thinks it's a class
 function PoorlyNamedFactory() {}
-factory.registerFactory("poorlyNamedFactory", PoorlyNamedFactory);
+
+// Use 'registerFactory' instead to force it to be registered as a factory
+factory.registerFactory("MyFactory", PoorlyNamedFactory);
 ```
 
 Define dependencies for a constructor that accepts positional parameters:
 
 ```js
-// Look at all those tasty positional parameters in this constructor function!
+// Look at all them tasty positional parameters in this constructor
 function Lunchable(meat, cheese, cracker, dessert) {}
 
-// Tell the factory how lunchables should be created using an array of strings
-factory.register(Lunchable, [
-  "Turkey",
-  "Cheddar",
-  "wheatCracker",
-  "pudding"
-]);
+// Tell the factory how lunchables should be created via an array of strings
+factory.register(Lunchable, ["Turkey", "Cheddar", "WheatCracker", "Pudding"]);
 
-// Now doing this:
+// Now doing this
 let lunchable1 = factory.create("Lunchable");
-// Is the same as doing this:
+
+// Is the same as doing this
 let lunchable2 = new Lunchable(
   new Turkey(),
   new Cheddar(),
@@ -116,12 +119,12 @@ Define dependencies for a constructor that accepts named parameters:
 ```js
 function Dinnerable({meat, cheese, cracker, dessert}) {}
 
-// Tell the factory how dinnerables should be created using an object of strings
+// Tell the factory how dinnerables should be created via an object of strings
 factory.register(Dinnerable, {
   meat: "Turkey",
   cheese: "Cheddar",
-  cracker: "wheatCracker",
-  dessert: "pudding",
+  cracker: "WheatCracker",
+  dessert: "Pudding",
 });
 
 let dinnerable = factory.create("Dinnerable");
@@ -155,7 +158,7 @@ let nastyDinnerable = factory.create("Dinnerable", {
 
 # Beware
 
-* Requires Node v5.0.0 or higher (or heavy transpiling)
+* Requires Node v5.0.0 or higher (or additional transpiling)
 * If using UglifyJS, then either use its --keep-fnames switch or only use register(Class|Factory|Singleton) override functions instead of register.
 * Circular dependencies will overflow the stack.
 * Overriding a dependency won't propogate the override to dependencies-of-dependencies.

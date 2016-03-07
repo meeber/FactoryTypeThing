@@ -62,13 +62,13 @@ export default function createFactory() {
   function getCreator(key) {
     if (!isRegistered(key)) throw ReferenceError();
 
-    return creators.get(key);
+    return creators.get(key.toLowerCase());
   }
 
   function isRegistered(key) {
     if (!isValidKey(key)) throw TypeError();
 
-    return creators.has(key);
+    return creators.has(key.toLowerCase());
   }
 
   function register(value, deps) {
@@ -100,7 +100,8 @@ export default function createFactory() {
 
     forEach(keysUnion(deps, params), i => {
       finalParams[i] = has(params, i) && params[i] != DEFER ? params[i] 
-      : create(deps[i]);
+      : has(deps, i) ? create(deps[i])
+      : undefined;
     });
 
     // Wrapping finalParams in an array if its a non-array object lets us use
@@ -114,7 +115,7 @@ export default function createFactory() {
     if (!isValidValue(value, type)) throw TypeError();
     if (!isValidDeps(deps)) throw TypeError();
     
-    creators.set(key, {type, value, deps});
+    creators.set(key.toLowerCase(), {type, value, deps});
   }
 
   return {

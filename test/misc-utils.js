@@ -10,8 +10,8 @@ chai.should();
 
 describe("MiscUtils", function () {
   describe(".isProbablyClass", function () {
-    it("should return true for function that starts with uppercase"
-    , function () {
+    it("should return true for function that starts with uppercase",
+    function () {
       isProbablyClass(function SomeClass() {}).should.be.true;
     });
 
@@ -19,8 +19,8 @@ describe("MiscUtils", function () {
       isProbablyClass(42).should.be.false;
     });
 
-    it("should return false for function that starts with lowercase"
-    , function () {
+    it("should return false for function that starts with lowercase",
+    function () {
       isProbablyClass(function notClass() {}).should.be.false;
     });
   });
@@ -50,8 +50,8 @@ describe("MiscUtils", function () {
       onlyHasStrings(42).should.be.true;
     });
 
-    it("should return false for array with at least one non-string value"
-    , function () {
+    it("should return false for array with at least one non-string value",
+    function () {
       onlyHasStrings(["test1", 42]).should.be.false;
     });
 
@@ -62,13 +62,13 @@ describe("MiscUtils", function () {
   });
 
   describe(".startsUppercase", function () {
-    it("should return true for string with first character being uppercase"
-    , function () {
+    it("should return true for string with first character being uppercase",
+    function () {
       startsUppercase("Yup").should.be.true;
     });
 
-    it("should return false for string with first character not being uppercase"
-    , function () {
+    it("should return false for string with first character not being"
+    + " uppercase", function () {
       startsUppercase("nope").should.be.false;
     });
 
