@@ -132,8 +132,8 @@ describe("Factory", function () {
     });
 
     it("should override dependencies in deps non-array object with values in"
-    + " params array and pass them to function registered with given key"
-    , function () {
+    + " params array and pass them to function registered with given key",
+    function () {
       function TestClass({param1, param2}) {
         this.param1 = param1;
         this.param2 = param2;
@@ -198,8 +198,8 @@ describe("Factory", function () {
       isUndefined(result.param).should.be.true;
     });
 
-    it("should throw TypeError if params isn't an object or undefined"
-    , function () {
+    it("should throw TypeError if params isn't an object or undefined", 
+    function () {
       let value = () => { return {j: 42}; };
       let deps = undefined;
       let params = 43;
@@ -257,8 +257,8 @@ describe("Factory", function () {
       deps = ["dep1", "dep2"];
     });
   
-    it("should return the type, value, and deps for the creator with given key"
-    , function () {
+    it("should return the type, value, and deps for the creator with given key",
+    function () {
       factory.setCreator(type, key, value, deps);
       let creator = factory.getCreator(key);
   
@@ -479,8 +479,8 @@ describe("Factory", function () {
       creator.should.deep.equal({type, value, deps});
     });
   
-    it("should throw TypeError if type isn't 'class', 'factory', or 'singleton'"
-    , function () {
+    it("should throw TypeError if type isn't 'class', 'factory', or"
+    + " 'singleton'", function () {
       type = 42;
       
       (function () {
@@ -496,8 +496,8 @@ describe("Factory", function () {
       }).should.throw(TypeError);
     });
   
-    it("should throw TypeError if type is 'class' but value isn't a function"
-    , function () {
+    it("should throw TypeError if type is 'class' but value isn't a function",
+    function () {
       type = "class";
       value = 42;
   
@@ -506,8 +506,8 @@ describe("Factory", function () {
       }).should.throw(TypeError);
     });
   
-    it("should throw TypeError if type is 'factory' but value isn't a function"
-    , function () {
+    it("should throw TypeError if type is 'factory' but value isn't a function",
+    function () {
       value = 42;
   
       (function () {
@@ -533,8 +533,8 @@ describe("Factory", function () {
       }).should.throw(TypeError);
     });
   
-    it("should throw TypeError if deps isn't an array, object, or undefined"
-    , function () {
+    it("should throw TypeError if deps isn't an array, object, or undefined",
+    function () {
       deps = 42;
   
       (function () {
