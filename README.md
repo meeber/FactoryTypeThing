@@ -71,11 +71,10 @@ factory.registerSingleton("Pudding", pudding);
 // Although it doesn't have to be the same name as the variable
 factory.registerSingleton("Goop", pudding);
 
-// There's only one pudding (returns the same object it was given):
+// All puddings are equal (returns the same object every time):
 let pudding1 = factory.create("Pudding");
 let pudding2 = factory.create("pUdDiNg");
-let goop = factory.create("Goop");
-pudding1 === pudding2 === goop;
+pudding1 === pudding2;
 ```
 
 Override register's type detection and/or naming:
