@@ -250,6 +250,13 @@ describe("Factory", function () {
       creator.should.deep.equal({type, value, deps});
     });
   
+    it("should treat key with case insensitivity", function () {
+      factory.setCreator(type, key, value, deps);
+      let creator = factory.getCreator("TeStKeY");
+
+      creator.should.deep.equal({type, value, deps});
+    });
+
     it("should throw TypeError if key isn't a string", function () {
       key = undefined;
   
@@ -285,6 +292,12 @@ describe("Factory", function () {
       factory.isRegistered(key).should.be.false;
     });
   
+    it("should treat key with case insensitivity", function () {
+      factory.setCreator(type, key, value);
+
+      factory.isRegistered("TeStKeY").should.be.true;
+    });
+
     it("should throw TypeError if key isn't a string", function () {
       key = true;
   
@@ -436,6 +449,18 @@ describe("Factory", function () {
       factory.setCreator(type, key, value, deps);
       let creator = factory.getCreator(key);
   
+      creator.should.deep.equal({type, value, deps});
+    });
+
+    it("should replace existing creator when registering new creator with same"
+    + " case insensitive key", function () {
+      let otherKey = "TeStKeY";
+      let otherValue = () => { return {k: 43}; };
+
+      factory.setCreator(type, otherKey, otherValue, deps);
+      factory.setCreator(type, key, value, deps);
+      let creator = factory.getCreator(otherKey);
+
       creator.should.deep.equal({type, value, deps});
     });
   
