@@ -23,13 +23,13 @@ let factory = createFactory();
 Work with a traditional constructor:
 
 ```js
-// Constructor function (must start uppercase):
+// Constructor function (must start uppercase)
 function Turkey() { this.texture = "juicy"; }
 
-// Register the constructor with the factory:
+// Register the constructor with the factory
 factory.register(Turkey);
 
-// Instantiate some delicious case insensitive turkey (it knows to call "new"):
+// Instantiate some delicious case insensitive turkey (it knows to call "new")
 let turkey1 = factory.create("Turkey");
 let turkey2 = factory.create("tUrKeY");
 ```
@@ -37,7 +37,7 @@ let turkey2 = factory.create("tUrKeY");
 Work with an ES6 class:
 
 ```js
-// ES6 class (must start uppercase):
+// ES6 class (must start uppercase)
 class Cheddar { constructor() { this.flavorRating = 42; } }
 
 factory.register(Cheddar);
@@ -49,12 +49,12 @@ let cheddar2 = factory.create("cHeDdAr");
 Work with a factory function:
 
 ```js
-// Factory function (must start lowercase):
+// Factory function (must start lowercase)
 function wheatCracker() { return {numHoles: 7}; }
 
 factory.register(wheatCracker);
 
-// Mmm crackertime (it knows not to call "new"):
+// Mmm crackertime (it knows not to call "new")
 let wheatCracker1 = factory.create("WheatCracker");
 let wheatCracker2 = factory.create("wHeAtCrAcKeR");
 ```
@@ -71,7 +71,7 @@ factory.registerSingleton("Pudding", pudding);
 // Although it doesn't have to be the same name as the variable
 factory.registerSingleton("Goop", pudding);
 
-// All puddings are equal (returns the same object every time):
+// All puddings are equal (returns the same object every time)
 let pudding1 = factory.create("Pudding");
 let pudding2 = factory.create("pUdDiNg");
 pudding1 === pudding2;
@@ -102,10 +102,10 @@ function Lunchable(meat, cheese, cracker, dessert) {}
 // Tell the factory how lunchables should be created via an array of strings
 factory.register(Lunchable, ["Turkey", "Cheddar", "WheatCracker", "Pudding"]);
 
-// Now doing this:
+// Now doing this
 let lunchable1 = factory.create("Lunchable");
 
-// Is the same as doing this:
+// Is the same as doing this
 let lunchable2 = new Lunchable(
   new Turkey(),
   new Cheddar(),
