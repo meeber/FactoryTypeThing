@@ -100,7 +100,8 @@ export default function createFactory() {
 
     forEach(keysUnion(deps, params), i => {
       finalParams[i] = has(params, i) && params[i] != DEFER ? params[i] 
-      : create(deps[i]);
+      : has(deps, i) ? create(deps[i])
+      : undefined;
     });
 
     // Wrapping finalParams in an array if its a non-array object lets us use

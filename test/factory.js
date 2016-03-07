@@ -1,6 +1,6 @@
 import chai from "chai";
 import createFactory from "../src/factory";
-import {isSymbol} from "lodash";
+import {isSymbol, isUndefined} from "lodash";
 
 chai.should();
 
@@ -181,6 +181,21 @@ describe("Factory", function () {
 
       result.param1.should.deep.equal(dep1Result);
       result.param2.should.equal(43);
+    });
+
+    it("should pass undefined if params DEFERs for a key that isn't defined in"
+    + " deps", function () {
+      function TestClass(param) {
+        this.param = param;
+      }
+
+      let deps = undefined;
+      let params = [factory.DEFER];
+
+      factory.registerClass(key, TestClass, deps);
+      let result = factory.create(key, params);
+
+      isUndefined(result.param).should.be.true;
     });
 
     it("should throw TypeError if params isn't an object or undefined"
