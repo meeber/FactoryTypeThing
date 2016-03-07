@@ -104,7 +104,7 @@ export default function createFactory() {
       : undefined;
     });
 
-    // Wrapping finalParams in an array if its a non-array object lets us use
+    // Wrapping finalParams in an array if it's a non-array object lets us use
     // same "...finalParams" syntax for both positional and named parameters.
     return isArray(finalParams) ? finalParams : [finalParams];
   }
