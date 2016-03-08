@@ -41,9 +41,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const DEFER = Symbol();
 
 function createFactory() {
-  //////////////////////////////////////////////////////////////////////////////
-  //--------------------------------- Private --------------------------------//
-  //////////////////////////////////////////////////////////////////////////////
+  /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Private ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
   let creators = new Map();
 
   function isValidDeps(deps) {
@@ -65,11 +64,11 @@ function createFactory() {
   }
 
   function isValidValue(value, type) {
-    return type == "class" || type == "factory" ? (0, _isFunction2.default)(value) : type == "singleton" ? true : false;
+    return type == "class" || type == "factory" ? (0, _isFunction2.default)(value) : type == "singleton";
   }
-  //////////////////////////////////////////////////////////////////////////////
-  //--------------------------------- Public ---------------------------------//
-  //////////////////////////////////////////////////////////////////////////////
+
+  /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Public ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
   function create(key, params) {
     let creator = getCreator(key);
 
@@ -77,8 +76,9 @@ function createFactory() {
 
     let finalParams = resolveDeps(creator.deps, params);
 
-    if (creator.type == "factory") return creator.value(...finalParams);
     if (creator.type == "class") return new creator.value(...finalParams);
+
+    return creator.value(...finalParams);
   }
 
   function getCreator(key) {
@@ -123,7 +123,7 @@ function createFactory() {
       finalParams[i] = (0, _has2.default)(params, i) && params[i] != DEFER ? params[i] : (0, _has2.default)(deps, i) ? create(deps[i]) : undefined;
     });
 
-    // Wrapping finalParams in an array if its a non-array object lets us use
+    // Wrapping finalParams in an array if it's a non-array object lets us use
     // same "...finalParams" syntax for both positional and named parameters.
     return (0, _isArray2.default)(finalParams) ? finalParams : [finalParams];
   }
