@@ -8,11 +8,11 @@ describe("Factory", function () {
   describe(".createFactory", function () {
     it("should return a new Factory object", function () {
       let factory = createFactory();
-  
+
       factory.should.be.a("object");
     });
   });
- 
+
   describe("#create", function () {
     let factory, key;
 
@@ -24,7 +24,7 @@ describe("Factory", function () {
     it("should return a reference to the singleton that was registered with"
     + " given key", function () {
       let value = {j: 42};
-      
+
       factory.registerSingleton(key, value);
 
       factory.create(key).should.equal(value);
@@ -32,7 +32,7 @@ describe("Factory", function () {
 
     it("should return the result returned from calling the factory function"
     + " that was registered with given key", function () {
-      let value = () => { return {j: 42}; };
+      let value = () => ({j: 42});
 
       factory.registerFactory(key, value);
       let result1 = factory.create(key);
@@ -44,8 +44,8 @@ describe("Factory", function () {
 
     it("should return the result returned from calling new on the class that"
     + " was registered with given key", function () {
-      function TestClass() { this.j = 42; }
-      
+      function TestClass () { this.j = 42 }
+
       factory.registerClass(key, TestClass);
       let result1 = factory.create(key);
       let result2 = factory.create(key);
@@ -56,13 +56,13 @@ describe("Factory", function () {
 
     it("should resolve dependencies in deps array and pass them as positional"
     + " parameters to function registered with given key", function () {
-      function TestClass(param1, param2) {
+      function TestClass (param1, param2) {
         this.param1 = param1;
         this.param2 = param2;
       }
 
       let dep1Key = "dep1Key";
-      let dep1Value = () => { return {j: 42}; };
+      let dep1Value = () => ({j: 42});
       let dep2Key = "dep2Key";
       let dep2Value = {k: 42};
       let deps = [dep1Key, dep2Key];
@@ -82,13 +82,13 @@ describe("Factory", function () {
 
     it("should override dependencies in deps array with values in params array"
     + " and pass them to function registered with given key", function () {
-      function TestClass(param1, param2) {
+      function TestClass (param1, param2) {
         this.param1 = param1;
         this.param2 = param2;
       }
 
       let dep1Key = "dep1Key";
-      let dep1Value = () => { return {j: 42}; };
+      let dep1Value = () => ({j: 42});
       let dep2Key = "dep2Key";
       let dep2Value = {k: 42};
       let deps = [dep1Key, dep2Key];
@@ -107,13 +107,13 @@ describe("Factory", function () {
 
     it("should resolve dependencies in deps non-array object and pass them as"
     + " named parameters to function registered with given key", function () {
-      function TestClass({param1, param2}) {
+      function TestClass ({param1, param2}) {
         this.param1 = param1;
         this.param2 = param2;
       }
 
       let dep1Key = "dep1Key";
-      let dep1Value = () => { return {j: 42}; };
+      let dep1Value = () => ({j: 42});
       let dep2Key = "dep2Key";
       let dep2Value = {k: 42};
       let deps = {param1: dep1Key, param2: dep2Key};
@@ -134,13 +134,13 @@ describe("Factory", function () {
     it("should override dependencies in deps non-array object with values in"
     + " params array and pass them to function registered with given key",
     function () {
-      function TestClass({param1, param2}) {
+      function TestClass ({param1, param2}) {
         this.param1 = param1;
         this.param2 = param2;
       }
 
       let dep1Key = "dep1Key";
-      let dep1Value = () => { return {j: 42}; };
+      let dep1Value = () => ({j: 42});
       let dep2Key = "dep2Key";
       let dep2Value = {k: 42};
       let deps = {param1: dep1Key, param2: dep2Key};
@@ -160,13 +160,13 @@ describe("Factory", function () {
 
     it("should defer to dependencies in deps for any params key with a value of"
     + " factory's DEFER symbol", function () {
-      function TestClass(param1, param2) {
+      function TestClass (param1, param2) {
         this.param1 = param1;
         this.param2 = param2;
       }
 
       let dep1Key = "dep1Key";
-      let dep1Value = () => { return {j: 42}; };
+      let dep1Value = () => ({j: 42});
       let dep2Key = "dep2Key";
       let dep2Value = {k: 42};
       let deps = [dep1Key, dep2Key];
@@ -185,11 +185,11 @@ describe("Factory", function () {
 
     it("should pass undefined if params DEFERs for a key that isn't defined in"
     + " deps", function () {
-      function TestClass(param) {
+      function TestClass (param) {
         this.param = param;
       }
 
-      let deps = undefined;
+      let deps;
       let params = [factory.DEFER];
 
       factory.registerClass(key, TestClass, deps);
@@ -198,10 +198,10 @@ describe("Factory", function () {
       isUndefined(result.param).should.be.true;
     });
 
-    it("should throw TypeError if params isn't an object or undefined", 
+    it("should throw TypeError if params isn't an object or undefined",
     function () {
-      let value = () => { return {j: 42}; };
-      let deps = undefined;
+      let value = () => ({j: 42});
+      let deps;
       let params = 43;
 
       factory.registerFactory(key, value, deps);
@@ -213,7 +213,7 @@ describe("Factory", function () {
 
     it("should throw TypeError if deps is an array and params isn't an array or"
     + " undefined", function () {
-      let value = () => { return {j: 42}; };
+      let value = () => ({j: 42});
       let deps = [];
       let params = {k: 43};
 
@@ -226,7 +226,7 @@ describe("Factory", function () {
 
     it("should throw TypeError if params is an array and deps isn't an array or"
     + " undefined", function () {
-      let value = () => { return {j: 42}; };
+      let value = () => ({j: 42});
       let deps = {};
       let params = [43];
 
@@ -247,24 +247,24 @@ describe("Factory", function () {
   });
 
   describe("#getCreator", function () {
-    let factory, type, key, value, deps;
-  
+    let deps, factory, key, type, value;
+
     beforeEach(function () {
       factory = createFactory();
       type = "factory";
       key = "testKey";
-      value = () => { return {j: 42}; };
+      value = () => ({j: 42});
       deps = ["dep1", "dep2"];
     });
-  
+
     it("should return the type, value, and deps for the creator with given key",
     function () {
       factory.setCreator(type, key, value, deps);
       let creator = factory.getCreator(key);
-  
+
       creator.should.deep.equal({type, value, deps});
     });
-  
+
     it("should treat key with case insensitivity", function () {
       factory.setCreator(type, key, value, deps);
       let creator = factory.getCreator("TeStKeY");
@@ -274,39 +274,39 @@ describe("Factory", function () {
 
     it("should throw TypeError if key isn't a string", function () {
       key = undefined;
-  
+
       (function () {
         factory.getCreator(key);
       }).should.throw(TypeError);
     });
-  
+
     it("should throw ReferenceError if key isn't registered", function () {
       (function () {
         factory.getCreator(key);
       }).should.throw(ReferenceError);
     });
   });
-  
+
   describe("#isRegistered", function () {
-    let factory, type, key, value;
-  
+    let factory, key, type, value;
+
     beforeEach(function () {
       factory = createFactory();
       type = "factory";
       key = "testKey";
-      value = () => { return {j: 42}; };
+      value = () => ({j: 42});
     });
-  
+
     it("should return true if key was registered", function () {
       factory.setCreator(type, key, value);
-  
+
       factory.isRegistered(key).should.be.true;
     });
-  
+
     it("should return false if key wasn't registered", function () {
       factory.isRegistered(key).should.be.false;
     });
-  
+
     it("should treat key with case insensitivity", function () {
       factory.setCreator(type, key, value);
 
@@ -315,162 +315,162 @@ describe("Factory", function () {
 
     it("should throw TypeError if key isn't a string", function () {
       key = true;
-  
+
       (function () {
         factory.isRegistered(key);
       }).should.throw(TypeError);
     });
   });
-  
+
   describe("#register", function () {
-    let factory1, factory2, deps;
-  
+    let deps, factory1, factory2;
+
     beforeEach(function () {
       factory1 = createFactory();
       factory2 = createFactory();
       deps = ["dep1", "dep2"];
     });
-  
+
     it("should be same as calling registerClass with function's name as key if"
     + " value is a function that starts with an uppercase letter", function () {
+      function TestClass () { this.j = 42 }
       let key = "TestClass";
-      let value = function TestClass() { this.j = 42; };
-  
-      factory1.registerClass(key, value, deps);
+
+      factory1.registerClass(key, TestClass, deps);
       let creator1 = factory1.getCreator(key);
-  
-      factory2.register(value, deps);
+
+      factory2.register(TestClass, deps);
       let creator2 = factory2.getCreator(key);
-  
+
       creator1.should.deep.equal(creator2);
     });
 
     it("should be same as calling registerClass with class's name as key if"
     + " value is a class that starts with an uppercase letter", function () {
+      class TestClass { constructor () { this.j = 42 } }
       let key = "TestClass";
-      let value = class TestClass { constructor() { this.j = 42; } };
 
-      factory1.registerClass(key, value, deps);
+      factory1.registerClass(key, TestClass, deps);
       let creator1 = factory1.getCreator(key);
-  
-      factory2.register(value, deps);
+
+      factory2.register(TestClass, deps);
       let creator2 = factory2.getCreator(key);
-  
+
       creator1.should.deep.equal(creator2);
     });
-  
+
     it("should be same as calling registerFactory with function's name if value"
-    + " is a function that doesn't start with an uppercase letter", function ()
-    {
+    + " is a function that doesn't start with an uppercase letter",
+    function () {
+      function testFactory () { return {j: 42} }
       let key = "testFactory";
-      let value = function testFactory() { return {j: 42}; };
-  
-      factory1.registerFactory(key, value, deps);
+
+      factory1.registerFactory(key, testFactory, deps);
       let creator1 = factory1.getCreator(key);
-  
-      factory2.register(value, deps);
+
+      factory2.register(testFactory, deps);
       let creator2 = factory2.getCreator(key);
-  
+
       creator1.should.deep.equal(creator2);
     });
-  
+
     it("should throw TypeError if value isn't a function", function () {
       let value = {j: 42};
-  
+
       (function () {
         factory1.register(value);
       }).should.throw(TypeError);
     });
 
-    it("should throw TypeError if value is a function with no name", function ()
-    {
+    it("should throw TypeError if value is a function with no name",
+    function () {
       (function () {
         factory1.register(() => undefined);
       }).should.throw(TypeError);
     });
   });
-  
+
   describe("#registerClass", function () {
     it("should be same as calling setCreator with type 'class'", function () {
+      function TestClass () { this.j = 42 }
       let type = "class";
       let key = "testKey";
-      let value = function TestClass() { this.j = 42; };
       let deps = ["dep1", "dep2"];
-  
       let factory1 = createFactory();
-      factory1.setCreator(type, key, value, deps);
-      let creator1 = factory1.getCreator(key);
-  
       let factory2 = createFactory();
-      factory2.registerClass(key, value, deps);
+
+      factory1.setCreator(type, key, TestClass, deps);
+      let creator1 = factory1.getCreator(key);
+
+      factory2.registerClass(key, TestClass, deps);
       let creator2 = factory2.getCreator(key);
-  
+
       creator1.should.deep.equal(creator2);
     });
   });
-  
+
   describe("#registerFactory", function () {
     it("should be same as calling setCreator with type 'factory'", function () {
       let type = "factory";
       let key = "testKey";
-      let value = () => { return {j: 42}; };
+      let value = () => ({j: 42});
       let deps = ["dep1", "dep2"];
-  
       let factory1 = createFactory();
+      let factory2 = createFactory();
+
       factory1.setCreator(type, key, value, deps);
       let creator1 = factory1.getCreator(key);
-  
-      let factory2 = createFactory();
+
       factory2.registerFactory(key, value, deps);
       let creator2 = factory2.getCreator(key);
-  
+
       creator1.should.deep.equal(creator2);
     });
   });
-  
+
   describe("#registerSingleton", function () {
     it("should be same as calling setCreator with type 'singleton' and deps"
     + " undefined", function () {
       let type = "singleton";
       let key = "testKey";
       let value = {j: 42};
-      let deps = undefined;
-  
+      let deps;
       let factory1 = createFactory();
+      let factory2 = createFactory();
+
       factory1.setCreator(type, key, value, deps);
       let creator1 = factory1.getCreator(key);
-  
-      let factory2 = createFactory();
+
       factory2.registerSingleton(key, value);
       let creator2 = factory2.getCreator(key);
-  
+
       creator1.should.deep.equal(creator2);
     });
   });
-  
+
   describe("#setCreator", function () {
-    let factory, type, key, value, deps;
-  
+    let deps, factory, key, type, value;
+
     beforeEach(function () {
       factory = createFactory();
       type = "factory";
       key = "testKey";
-      value = () => { return {j: 42}; };
+      value = () => ({j: 42});
       deps = ["dep1", "dep2"];
     });
-  
+
     it("should add creator to registry such that type, value, and deps can be"
     + " retrieved by key", function () {
       factory.setCreator(type, key, value, deps);
       let creator = factory.getCreator(key);
-  
+
       creator.should.deep.equal({type, value, deps});
     });
 
     it("should replace existing creator when registering new creator with same"
     + " case insensitive key", function () {
       let otherKey = "TeStKeY";
-      let otherValue = () => { return {k: 43}; };
+      let otherValue = () => ({k: 43});
 
       factory.setCreator(type, otherKey, otherValue, deps);
       factory.setCreator(type, key, value, deps);
@@ -478,65 +478,65 @@ describe("Factory", function () {
 
       creator.should.deep.equal({type, value, deps});
     });
-  
+
     it("should throw TypeError if type isn't 'class', 'factory', or"
     + " 'singleton'", function () {
       type = 42;
-      
+
       (function () {
         factory.setCreator(type, key, value, deps);
       }).should.throw(TypeError);
     });
-  
+
     it("should throw TypeError if key isn't a string", function () {
       key = 42;
-  
+
       (function () {
         factory.setCreator(type, key, value, deps);
       }).should.throw(TypeError);
     });
-  
+
     it("should throw TypeError if type is 'class' but value isn't a function",
     function () {
       type = "class";
       value = 42;
-  
+
       (function () {
         factory.setCreator(type, key, value, deps);
       }).should.throw(TypeError);
     });
-  
+
     it("should throw TypeError if type is 'factory' but value isn't a function",
     function () {
       value = 42;
-  
+
       (function () {
         factory.setCreator(type, key, value, deps);
       }).should.throw(TypeError);
     });
-  
+
     it("should throw TypeError if deps is an array but with one or more"
     + " non-string elements", function () {
       deps = ["dep1", 42];
-  
+
       (function () {
         factory.setCreator(type, key, value, deps);
       }).should.throw(TypeError);
     });
-  
+
     it("should throw TypeError if deps is an object but with one or more"
     + " non-string values", function () {
       deps = {dep1: "good", dep2: 42};
-  
+
       (function () {
         factory.setCreator(type, key, value, deps);
       }).should.throw(TypeError);
     });
-  
+
     it("should throw TypeError if deps isn't an array, object, or undefined",
     function () {
       deps = 42;
-  
+
       (function () {
         factory.setCreator(type, key, value, deps);
       }).should.throw(TypeError);
