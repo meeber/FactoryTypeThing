@@ -1,4 +1,4 @@
-import { 
+import {
   findIndex,
   flatMap,
   isArray,
@@ -11,16 +11,16 @@ import {
   values,
 } from "lodash";
 
-// Doesn't work well with uglify unless its --keep-fnames is used. 
-function isProbablyClass(value) {
+// Doesn't work well with uglify unless its --keep-fnames is used.
+function isProbablyClass (value) {
   return isFunction(value) && startsUppercase(value.name);
 }
 
-function keysUnion(...objects) {
+function keysUnion (...objects) {
   return union(flatMap(objects, obj => keys(obj)));
 }
 
-function onlyHasStrings(value) {
+function onlyHasStrings (value) {
   let array = isArray(value) ? value
   : isObject(value) ? values(value)
   : undefined;
@@ -28,7 +28,7 @@ function onlyHasStrings(value) {
   return findIndex(array, i => !isString(i)) == -1;
 }
 
-function startsUppercase(value) {
+function startsUppercase (value) {
   return isString(value) && value.length >= 1 && value == upperFirst(value);
 }
 

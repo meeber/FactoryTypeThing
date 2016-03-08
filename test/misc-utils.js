@@ -12,7 +12,7 @@ describe("MiscUtils", function () {
   describe(".isProbablyClass", function () {
     it("should return true for function that starts with uppercase",
     function () {
-      isProbablyClass(function SomeClass() {}).should.be.true;
+      isProbablyClass(function SomeClass () {}).should.be.true;
     });
 
     it("should return false for non-function", function () {
@@ -21,13 +21,13 @@ describe("MiscUtils", function () {
 
     it("should return false for function that starts with lowercase",
     function () {
-      isProbablyClass(function notClass() {}).should.be.false;
+      isProbablyClass(function notClass () {}).should.be.false;
     });
   });
 
   describe(".keysUnion", function () {
-    it("should return an array of unique keys across given objects", function ()
-    {
+    it("should return an array of unique keys across given objects",
+    function () {
       let obj1 = {1: "nice", b: "yup"};
       let obj2 = {b: "yea", a: "okay"};
       let obj3 = ["wat", "is", "this"];
@@ -40,12 +40,12 @@ describe("MiscUtils", function () {
     it("should return true for array with no non-string values", function () {
       onlyHasStrings(["test1", "test2"]).should.be.true;
     });
-  
+
     it("should return true for non-array object with no non-string values in"
     + " own enumerable properties", function () {
       onlyHasStrings({key1: "test1", key2: "test2"}).should.be.true;
     });
-  
+
     it("should return true for non-object", function () {
       onlyHasStrings(42).should.be.true;
     });
