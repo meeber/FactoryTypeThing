@@ -31,12 +31,12 @@ function isValidParams (params, deps) {
 }
 
 function isValidType (type) {
-  return type == "class" || type == "factory" || type == "singleton";
+  return type === "class" || type === "factory" || type === "singleton";
 }
 
 function isValidValue (value, type) {
-  return type == "class" || type == "factory" ? isFunction(value)
-  : type == "singleton";
+  return type === "class" || type === "factory" ? isFunction(value)
+  : type === "singleton";
 }
 
 export default function createFactory () {
@@ -45,11 +45,11 @@ export default function createFactory () {
   function create (key, params) {
     let creator = getCreator(key);
 
-    if (creator.type == "singleton") return creator.value;
+    if (creator.type === "singleton") return creator.value;
 
     let finalParams = resolveDeps(creator.deps, params);
 
-    if (creator.type == "class") return new creator.value(...finalParams);
+    if (creator.type === "class") return new creator.value(...finalParams);
 
     return creator.value(...finalParams);
   }
@@ -94,7 +94,7 @@ export default function createFactory () {
     let finalParams = isArray(deps) || isArray(params) ? [] : {};
 
     forEach(keysUnion(deps, params), i => {
-      finalParams[i] = has(params, i) && params[i] != DEFER ? params[i]
+      finalParams[i] = has(params, i) && params[i] !== DEFER ? params[i]
       : has(deps, i) ? create(deps[i])
       : undefined;
     });

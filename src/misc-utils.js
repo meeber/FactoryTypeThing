@@ -25,11 +25,11 @@ function onlyHasStrings (value) {
   : isObject(value) ? values(value)
   : undefined;
 
-  return findIndex(array, i => !isString(i)) == -1;
+  return findIndex(array, i => !isString(i)) === -1;
 }
 
 function startsUppercase (value) {
-  return isString(value) && value.length >= 1 && value == upperFirst(value);
+  return isString(value) && value.length >= 1 && value === upperFirst(value);
 }
 
 module.exports = {
