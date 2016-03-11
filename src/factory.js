@@ -11,40 +11,36 @@ import {isProbablyClass, keysUnion, onlyHasStrings} from "./misc-utils";
 
 const DEFER = Symbol();
 
+function isValidDeps (deps) {
+  return isUndefined(deps) ? true
+  : isObject(deps) ? onlyHasStrings(deps)
+  : false;
+}
+
+// Technically any type of key would work since Map allows anything. But keys
+// like undefined and NaN open door to sneaky bugs so no thanks.
+function isValidKey (key) {
+  return isString(key);
+}
+
+function isValidParams (params, deps) {
+  return isUndefined(params) ? true
+  : isArray(params) ? isArray(deps) || isUndefined(deps)
+  : isObject(params) ? !isArray(deps)
+  : false;
+}
+
+function isValidType (type) {
+  return type == "class" || type == "factory" || type == "singleton";
+}
+
+function isValidValue (value, type) {
+  return type == "class" || type == "factory" ? isFunction(value)
+  : type == "singleton";
+}
+
 export default function createFactory () {
-  /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Private ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-
   let creators = new Map();
-
-  function isValidDeps (deps) {
-    return isUndefined(deps) ? true
-    : isObject(deps) ? onlyHasStrings(deps)
-    : false;
-  }
-
-  // Technically any type of key would work since Map allows anything. But keys
-  // like undefined and NaN open door to sneaky bugs so no thanks.
-  function isValidKey (key) {
-    return isString(key);
-  }
-
-  function isValidParams (params, deps) {
-    return isUndefined(params) ? true
-    : isArray(params) ? isArray(deps) || isUndefined(deps)
-    : isObject(params) ? !isArray(deps)
-    : false;
-  }
-
-  function isValidType (type) {
-    return type == "class" || type == "factory" || type == "singleton";
-  }
-
-  function isValidValue (value, type) {
-    return type == "class" || type == "factory" ? isFunction(value)
-    : type == "singleton";
-  }
-
-  /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Public ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
   function create (key, params) {
     let creator = getCreator(key);
