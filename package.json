@@ -20,8 +20,8 @@
     "babel-plugin-transform-es2015-modules-commonjs": "^6.7.0",
     "babel-plugin-transform-es2015-parameters": "^6.7.0",
     "chai": "^3.5.0",
-    "eslint": "^2.3.0",
-    "eslint-config-tt": "^0.2.0",
+    "eslint": "^2.4.0",
+    "eslint-config-tt": "^0.3.0",
     "mocha": "^2.4.5"
   },
   "scripts": {
