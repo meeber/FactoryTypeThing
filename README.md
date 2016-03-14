@@ -2,7 +2,7 @@
 
 JavaScript object creator and dependency manager.
 
-Register all of your classes and/or factory functions (as well as their dependencies) at the start of your application, and then inject the factory into any object that needs to instantiate other objects.
+Register all of your classes, factory functions, and/or services (as well as their dependencies) at the start of your application, and then inject the factory into any object that needs to instantiate or locate other objects.
 
 # Install
 
@@ -59,22 +59,37 @@ let wheatCracker1 = factory.create("WheatCracker");
 let wheatCracker2 = factory.create("wHeAtCrAcKeR");
 ```
 
-Work with a singleton:
+Work with an existing service (singleton):
 
 ```js
-// A singleton object; 'register' won't know what to do with this
+// A service object; 'register' won't know what to do with this
 var pudding = {hasSprinkes: true};
 
-// Use 'registerSingleton' instead; must provide a name as first parameter
-factory.registerSingleton("Pudding", pudding);
+// Use 'registerService' instead; must provide a name as first parameter
+factory.registerService("Pudding", pudding);
 
 // Although it doesn't have to be the same name as the variable
-factory.registerSingleton("Goop", pudding);
+factory.registerService("Goop", pudding);
 
-// All puddings are equal (returns the same object every time)
-let pudding1 = factory.create("Pudding");
-let pudding2 = factory.create("pUdDiNg");
+// Use 'locate' instead of 'create' (returns the same object every time)
+let pudding1 = factory.locate("Pudding");
+let pudding2 = factory.locate("pUdDiNg");
 pudding1 === pudding2;
+```
+
+Convert a class or factory function into a service (singleton):
+
+```js
+// ES6 class (must start uppercase)
+class Brownie { constructor() { this.hasSprinkles = false; } }
+
+// Register the class like normal
+factory.register(Brownie);
+
+// Use 'locate' to permanently convert class to a service (singleton)
+let brownie1 = factory.locate("Brownie");
+let brownie2 = factory.locate("bRowNiE");
+brownie1 === brownie2;
 ```
 
 Override register's type detection and/or naming:
@@ -159,7 +174,7 @@ let nastyDinnerable = factory.create("Dinnerable", {
 # Beware
 
 * Requires Node v5.0.0 or higher (or additional transpiling).
-* If using UglifyJS, then either use its --keep-fnames switch or only use register(Class|Factory|Singleton) override functions instead of register.
+* If using UglifyJS, then either use its --keep-fnames switch or only use register(Class|Factory|Service) override functions instead of register.
 * Circular dependencies will overflow the stack.
 * Overriding a dependency won't propogate the override to dependencies-of-dependencies.
 

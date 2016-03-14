@@ -21,11 +21,11 @@ describe("Factory", function () {
       key = "testKey";
     });
 
-    it("should return a reference to the singleton that was registered with"
-    + " given key", function () {
+    it("should return a reference to the service that was registered with given"
+    + " key", function () {
       let value = {j: 42};
 
-      factory.registerSingleton(key, value);
+      factory.registerService(key, value);
 
       factory.create(key).should.equal(value);
     });
@@ -69,7 +69,7 @@ describe("Factory", function () {
 
       factory.registerClass(key, TestClass, deps);
       factory.registerFactory(dep1Key, dep1Value);
-      factory.registerSingleton(dep2Key, dep2Value);
+      factory.registerService(dep2Key, dep2Value);
 
       let result = factory.create(key);
       let dep1Result = factory.create(dep1Key);
@@ -96,7 +96,7 @@ describe("Factory", function () {
 
       factory.registerClass(key, TestClass, deps);
       factory.registerFactory(dep1Key, dep1Value);
-      factory.registerSingleton(dep2Key, dep2Value);
+      factory.registerService(dep2Key, dep2Value);
 
       let result = factory.create(key, params);
       let dep2Result = factory.create(dep2Key);
@@ -120,7 +120,7 @@ describe("Factory", function () {
 
       factory.registerClass(key, TestClass, deps);
       factory.registerFactory(dep1Key, dep1Value);
-      factory.registerSingleton(dep2Key, dep2Value);
+      factory.registerService(dep2Key, dep2Value);
 
       let result = factory.create(key);
       let dep1Result = factory.create(dep1Key);
@@ -148,7 +148,7 @@ describe("Factory", function () {
 
       factory.registerClass(key, TestClass, deps);
       factory.registerFactory(dep1Key, dep1Value);
-      factory.registerSingleton(dep2Key, dep2Value);
+      factory.registerService(dep2Key, dep2Value);
 
       let result = factory.create(key, params);
       let dep1Result = factory.create(dep1Key);
@@ -174,7 +174,7 @@ describe("Factory", function () {
 
       factory.registerClass(key, TestClass, deps);
       factory.registerFactory(dep1Key, dep1Value);
-      factory.registerSingleton(dep2Key, dep2Value);
+      factory.registerService(dep2Key, dep2Value);
 
       let result = factory.create(key, params);
       let dep1Result = factory.create(dep1Key);
@@ -196,6 +196,20 @@ describe("Factory", function () {
       let result = factory.create(key, params);
 
       isUndefined(result.param).should.be.true;
+    });
+
+    it("should throw TypeError if key isn't a string", function () {
+      key = undefined;
+
+      (function () {
+        factory.create(key);
+      }).should.throw(TypeError);
+    });
+
+    it("should throw ReferenceError if key isn't registered", function () {
+      (function () {
+        factory.create(key);
+      }).should.throw(ReferenceError);
     });
 
     it("should throw TypeError if params isn't an object or undefined",
@@ -246,7 +260,7 @@ describe("Factory", function () {
     });
   });
 
-  describe("#getCreator", function () {
+  describe("#getEntry", function () {
     let deps, factory, key, type, value;
 
     beforeEach(function () {
@@ -257,32 +271,32 @@ describe("Factory", function () {
       deps = ["dep1", "dep2"];
     });
 
-    it("should return the type, value, and deps for the creator with given key",
+    it("should return the type, value, and deps for the entry with given key",
     function () {
-      factory.setCreator(type, key, value, deps);
-      let creator = factory.getCreator(key);
+      factory.setEntry(type, key, value, deps);
+      let entry = factory.getEntry(key);
 
-      creator.should.deep.equal({type, value, deps});
+      entry.should.deep.equal({type, value, deps});
     });
 
     it("should treat key with case insensitivity", function () {
-      factory.setCreator(type, key, value, deps);
-      let creator = factory.getCreator("TeStKeY");
+      factory.setEntry(type, key, value, deps);
+      let entry = factory.getEntry("TeStKeY");
 
-      creator.should.deep.equal({type, value, deps});
+      entry.should.deep.equal({type, value, deps});
     });
 
     it("should throw TypeError if key isn't a string", function () {
       key = undefined;
 
       (function () {
-        factory.getCreator(key);
+        factory.getEntry(key);
       }).should.throw(TypeError);
     });
 
     it("should throw ReferenceError if key isn't registered", function () {
       (function () {
-        factory.getCreator(key);
+        factory.getEntry(key);
       }).should.throw(ReferenceError);
     });
   });
@@ -298,7 +312,7 @@ describe("Factory", function () {
     });
 
     it("should return true if key was registered", function () {
-      factory.setCreator(type, key, value);
+      factory.setEntry(type, key, value);
 
       factory.isRegistered(key).should.be.true;
     });
@@ -308,7 +322,7 @@ describe("Factory", function () {
     });
 
     it("should treat key with case insensitivity", function () {
-      factory.setCreator(type, key, value);
+      factory.setEntry(type, key, value);
 
       factory.isRegistered("TeStKeY").should.be.true;
     });
@@ -319,6 +333,61 @@ describe("Factory", function () {
       (function () {
         factory.isRegistered(key);
       }).should.throw(TypeError);
+    });
+  });
+
+  describe("#locate", function () {
+    let factory, key;
+
+    beforeEach(function () {
+      factory = createFactory();
+      key = "testKey";
+    });
+
+    it("should be the same as calling create for the service with given key",
+    function () {
+      let value = {j: 42};
+
+      factory.registerService(key, value);
+
+      factory.locate(key).should.equal(value);
+    });
+
+    it("should return the same result as calling create for the factory or"
+    + " class with given key", function () {
+      let value = () => ({j: 42});
+
+      factory.registerFactory(key, value);
+      let result1 = factory.create(key);
+      let result2 = factory.locate(key);
+
+      result1.should.not.equal(result2);
+      result1.should.deep.equal(result2);
+    });
+
+    it("should convert factory or class to a service so subsequent calls return"
+    + " same reference", function () {
+      let value = () => ({j: 42});
+
+      factory.registerFactory(key, value);
+      let result1 = factory.locate(key);
+      let result2 = factory.locate(key);
+
+      result1.should.equal(result2);
+    });
+
+    it("should throw TypeError if key isn't a string", function () {
+      key = undefined;
+
+      (function () {
+        factory.locate(key);
+      }).should.throw(TypeError);
+    });
+
+    it("should throw ReferenceError if key isn't registered", function () {
+      (function () {
+        factory.locate(key);
+      }).should.throw(ReferenceError);
     });
   });
 
@@ -337,12 +406,12 @@ describe("Factory", function () {
       let key = "TestClass";
 
       factory1.registerClass(key, TestClass, deps);
-      let creator1 = factory1.getCreator(key);
+      let entry1 = factory1.getEntry(key);
 
       factory2.register(TestClass, deps);
-      let creator2 = factory2.getCreator(key);
+      let entry2 = factory2.getEntry(key);
 
-      creator1.should.deep.equal(creator2);
+      entry1.should.deep.equal(entry2);
     });
 
     it("should be same as calling registerClass with class's name as key if"
@@ -351,12 +420,12 @@ describe("Factory", function () {
       let key = "TestClass";
 
       factory1.registerClass(key, TestClass, deps);
-      let creator1 = factory1.getCreator(key);
+      let entry1 = factory1.getEntry(key);
 
       factory2.register(TestClass, deps);
-      let creator2 = factory2.getCreator(key);
+      let entry2 = factory2.getEntry(key);
 
-      creator1.should.deep.equal(creator2);
+      entry1.should.deep.equal(entry2);
     });
 
     it("should be same as calling registerFactory with function's name if value"
@@ -366,12 +435,12 @@ describe("Factory", function () {
       let key = "testFactory";
 
       factory1.registerFactory(key, testFactory, deps);
-      let creator1 = factory1.getCreator(key);
+      let entry1 = factory1.getEntry(key);
 
       factory2.register(testFactory, deps);
-      let creator2 = factory2.getCreator(key);
+      let entry2 = factory2.getEntry(key);
 
-      creator1.should.deep.equal(creator2);
+      entry1.should.deep.equal(entry2);
     });
 
     it("should throw TypeError if value isn't a function", function () {
@@ -391,7 +460,7 @@ describe("Factory", function () {
   });
 
   describe("#registerClass", function () {
-    it("should be same as calling setCreator with type 'class'", function () {
+    it("should be same as calling setEntry with type 'class'", function () {
       function TestClass () { this.j = 42 }
       let type = "class";
       let key = "testKey";
@@ -399,18 +468,18 @@ describe("Factory", function () {
       let factory1 = createFactory();
       let factory2 = createFactory();
 
-      factory1.setCreator(type, key, TestClass, deps);
-      let creator1 = factory1.getCreator(key);
+      factory1.setEntry(type, key, TestClass, deps);
+      let entry1 = factory1.getEntry(key);
 
       factory2.registerClass(key, TestClass, deps);
-      let creator2 = factory2.getCreator(key);
+      let entry2 = factory2.getEntry(key);
 
-      creator1.should.deep.equal(creator2);
+      entry1.should.deep.equal(entry2);
     });
   });
 
   describe("#registerFactory", function () {
-    it("should be same as calling setCreator with type 'factory'", function () {
+    it("should be same as calling setEntry with type 'factory'", function () {
       let type = "factory";
       let key = "testKey";
       let value = () => ({j: 42});
@@ -418,37 +487,37 @@ describe("Factory", function () {
       let factory1 = createFactory();
       let factory2 = createFactory();
 
-      factory1.setCreator(type, key, value, deps);
-      let creator1 = factory1.getCreator(key);
+      factory1.setEntry(type, key, value, deps);
+      let entry1 = factory1.getEntry(key);
 
       factory2.registerFactory(key, value, deps);
-      let creator2 = factory2.getCreator(key);
+      let entry2 = factory2.getEntry(key);
 
-      creator1.should.deep.equal(creator2);
+      entry1.should.deep.equal(entry2);
     });
   });
 
-  describe("#registerSingleton", function () {
-    it("should be same as calling setCreator with type 'singleton' and deps"
+  describe("#registerService", function () {
+    it("should be same as calling setEntry with type 'service' and deps"
     + " undefined", function () {
-      let type = "singleton";
+      let type = "service";
       let key = "testKey";
       let value = {j: 42};
       let deps;
       let factory1 = createFactory();
       let factory2 = createFactory();
 
-      factory1.setCreator(type, key, value, deps);
-      let creator1 = factory1.getCreator(key);
+      factory1.setEntry(type, key, value, deps);
+      let entry1 = factory1.getEntry(key);
 
-      factory2.registerSingleton(key, value);
-      let creator2 = factory2.getCreator(key);
+      factory2.registerService(key, value);
+      let entry2 = factory2.getEntry(key);
 
-      creator1.should.deep.equal(creator2);
+      entry1.should.deep.equal(entry2);
     });
   });
 
-  describe("#setCreator", function () {
+  describe("#setEntry", function () {
     let deps, factory, key, type, value;
 
     beforeEach(function () {
@@ -459,32 +528,32 @@ describe("Factory", function () {
       deps = ["dep1", "dep2"];
     });
 
-    it("should add creator to registry such that type, value, and deps can be"
+    it("should add entry to registry such that type, value, and deps can be"
     + " retrieved by key", function () {
-      factory.setCreator(type, key, value, deps);
-      let creator = factory.getCreator(key);
+      factory.setEntry(type, key, value, deps);
+      let entry = factory.getEntry(key);
 
-      creator.should.deep.equal({type, value, deps});
+      entry.should.deep.equal({type, value, deps});
     });
 
-    it("should replace existing creator when registering new creator with same"
+    it("should replace existing entry when registering new entry with same"
     + " case insensitive key", function () {
       let otherKey = "TeStKeY";
       let otherValue = () => ({k: 43});
 
-      factory.setCreator(type, otherKey, otherValue, deps);
-      factory.setCreator(type, key, value, deps);
-      let creator = factory.getCreator(otherKey);
+      factory.setEntry(type, otherKey, otherValue, deps);
+      factory.setEntry(type, key, value, deps);
+      let entry = factory.getEntry(otherKey);
 
-      creator.should.deep.equal({type, value, deps});
+      entry.should.deep.equal({type, value, deps});
     });
 
-    it("should throw TypeError if type isn't 'class', 'factory', or"
-    + " 'singleton'", function () {
+    it("should throw TypeError if type isn't 'class', 'factory', or 'service'",
+    function () {
       type = 42;
 
       (function () {
-        factory.setCreator(type, key, value, deps);
+        factory.setEntry(type, key, value, deps);
       }).should.throw(TypeError);
     });
 
@@ -492,7 +561,7 @@ describe("Factory", function () {
       key = 42;
 
       (function () {
-        factory.setCreator(type, key, value, deps);
+        factory.setEntry(type, key, value, deps);
       }).should.throw(TypeError);
     });
 
@@ -502,7 +571,7 @@ describe("Factory", function () {
       value = 42;
 
       (function () {
-        factory.setCreator(type, key, value, deps);
+        factory.setEntry(type, key, value, deps);
       }).should.throw(TypeError);
     });
 
@@ -511,7 +580,7 @@ describe("Factory", function () {
       value = 42;
 
       (function () {
-        factory.setCreator(type, key, value, deps);
+        factory.setEntry(type, key, value, deps);
       }).should.throw(TypeError);
     });
 
@@ -520,7 +589,7 @@ describe("Factory", function () {
       deps = ["dep1", 42];
 
       (function () {
-        factory.setCreator(type, key, value, deps);
+        factory.setEntry(type, key, value, deps);
       }).should.throw(TypeError);
     });
 
@@ -529,7 +598,7 @@ describe("Factory", function () {
       deps = {dep1: "good", dep2: 42};
 
       (function () {
-        factory.setCreator(type, key, value, deps);
+        factory.setEntry(type, key, value, deps);
       }).should.throw(TypeError);
     });
 
@@ -538,7 +607,7 @@ describe("Factory", function () {
       deps = 42;
 
       (function () {
-        factory.setCreator(type, key, value, deps);
+        factory.setEntry(type, key, value, deps);
       }).should.throw(TypeError);
     });
   });

@@ -31,39 +31,51 @@ function isValidParams (params, deps) {
 }
 
 function isValidType (type) {
-  return type === "class" || type === "factory" || type === "singleton";
+  return type === "class" || type === "factory" || type === "service";
 }
 
 function isValidValue (value, type) {
   return type === "class" || type === "factory" ? isFunction(value)
-  : type === "singleton";
+  : type === "service";
 }
 
 export default function createFactory () {
-  let creators = new Map();
+  let registry = new Map();
 
   function create (key, params) {
-    let creator = getCreator(key);
+    let entry = getEntry(key);
 
-    if (creator.type === "singleton") return creator.value;
+    if (entry.type === "service") return entry.value;
 
-    let finalParams = resolveDeps(creator.deps, params);
+    let finalParams = resolveDeps(entry.deps, params);
 
-    if (creator.type === "class") return new creator.value(...finalParams);
+    if (entry.type === "class") return new entry.value(...finalParams);
 
-    return creator.value(...finalParams);
+    return entry.value(...finalParams);
   }
 
-  function getCreator (key) {
+  function getEntry (key) {
     if (!isRegistered(key)) throw ReferenceError();
 
-    return creators.get(key.toLowerCase());
+    return registry.get(key.toLowerCase());
   }
 
   function isRegistered (key) {
     if (!isValidKey(key)) throw TypeError();
 
-    return creators.has(key.toLowerCase());
+    return registry.has(key.toLowerCase());
+  }
+
+  function locate (key, params) {
+    let entry = getEntry(key);
+
+    if (entry.type === "service") return entry.value;
+
+    let service = create(key, params);
+
+    registerService(key, service);
+
+    return service;
   }
 
   function register (value, deps) {
@@ -75,15 +87,15 @@ export default function createFactory () {
   }
 
   function registerClass (key, classFn, deps) {
-    setCreator("class", key, classFn, deps);
+    setEntry("class", key, classFn, deps);
   }
 
   function registerFactory (key, factoryFn, deps) {
-    setCreator("factory", key, factoryFn, deps);
+    setEntry("factory", key, factoryFn, deps);
   }
 
-  function registerSingleton (key, singleton) {
-    setCreator("singleton", key, singleton);
+  function registerService (key, service) {
+    setEntry("service", key, service);
   }
 
   // Room for minor performance gains here by using a different algorithm for
@@ -104,24 +116,25 @@ export default function createFactory () {
     return isArray(finalParams) ? finalParams : [finalParams];
   }
 
-  function setCreator (type, key, value, deps) {
+  function setEntry (type, key, value, deps) {
     if (!isValidType(type)) throw TypeError();
     if (!isValidKey(key)) throw TypeError();
     if (!isValidValue(value, type)) throw TypeError();
     if (!isValidDeps(deps)) throw TypeError();
 
-    creators.set(key.toLowerCase(), {type, value, deps});
+    registry.set(key.toLowerCase(), {type, value, deps});
   }
 
   return {
     create,
     DEFER,
-    getCreator,
+    getEntry,
     isRegistered,
+    locate,
     register,
     registerClass,
     registerFactory,
-    registerSingleton,
-    setCreator,
+    registerService,
+    setEntry,
   };
 }

@@ -4,7 +4,7 @@ module.exports = {
   extends: "tt",
   rules: {
     "new-cap": [2, {
-      newIsCapExceptions: ["creator.value"],
+      newIsCapExceptions: ["entry.value"],
       capIsNewExceptions: ["TypeError", "ReferenceError"],
     }],
   },
