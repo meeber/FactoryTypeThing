@@ -4,33 +4,33 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _has = require("lodash/has");
+var _isUndefined2 = require("lodash/isUndefined");
 
-var _has2 = _interopRequireDefault(_has);
+var _isUndefined3 = _interopRequireDefault(_isUndefined2);
 
-var _forEach = require("lodash/forEach");
+var _isString2 = require("lodash/isString");
 
-var _forEach2 = _interopRequireDefault(_forEach);
+var _isString3 = _interopRequireDefault(_isString2);
 
-var _isFunction = require("lodash/isFunction");
+var _isObject2 = require("lodash/isObject");
 
-var _isFunction2 = _interopRequireDefault(_isFunction);
+var _isObject3 = _interopRequireDefault(_isObject2);
 
-var _isArray = require("lodash/isArray");
+var _isFunction2 = require("lodash/isFunction");
 
-var _isArray2 = _interopRequireDefault(_isArray);
+var _isFunction3 = _interopRequireDefault(_isFunction2);
 
-var _isString = require("lodash/isString");
+var _isArray2 = require("lodash/isArray");
 
-var _isString2 = _interopRequireDefault(_isString);
+var _isArray3 = _interopRequireDefault(_isArray2);
 
-var _isObject = require("lodash/isObject");
+var _has2 = require("lodash/has");
 
-var _isObject2 = _interopRequireDefault(_isObject);
+var _has3 = _interopRequireDefault(_has2);
 
-var _isUndefined = require("lodash/isUndefined");
+var _forEach2 = require("lodash/forEach");
 
-var _isUndefined2 = _interopRequireDefault(_isUndefined);
+var _forEach3 = _interopRequireDefault(_forEach2);
 
 exports.default = createFactory;
 
@@ -40,76 +40,84 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 const DEFER = Symbol();
 
+function isValidDeps(deps) {
+  return (0, _isUndefined3.default)(deps) ? true : (0, _isObject3.default)(deps) ? (0, _miscUtils.onlyHasStrings)(deps) : false;
+}
+
+// Technically any type of key would work since Map allows anything. But keys
+// like undefined and NaN open door to sneaky bugs so no thanks.
+function isValidKey(key) {
+  return (0, _isString3.default)(key);
+}
+
+function isValidParams(params, deps) {
+  return (0, _isUndefined3.default)(params) ? true : (0, _isArray3.default)(params) ? (0, _isArray3.default)(deps) || (0, _isUndefined3.default)(deps) : (0, _isObject3.default)(params) ? !(0, _isArray3.default)(deps) : false;
+}
+
+function isValidType(type) {
+  return type === "class" || type === "factory" || type === "service";
+}
+
+function isValidValue(value, type) {
+  return type === "class" || type === "factory" ? (0, _isFunction3.default)(value) : type === "service";
+}
+
 function createFactory() {
-  /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Private ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-
-  let creators = new Map();
-
-  function isValidDeps(deps) {
-    return (0, _isUndefined2.default)(deps) ? true : (0, _isObject2.default)(deps) ? (0, _miscUtils.onlyHasStrings)(deps) : false;
-  }
-
-  // Technically any type of key would work since Map allows anything. But keys
-  // like undefined and NaN open door to sneaky bugs so no thanks.
-  function isValidKey(key) {
-    return (0, _isString2.default)(key);
-  }
-
-  function isValidParams(params, deps) {
-    return (0, _isUndefined2.default)(params) ? true : (0, _isArray2.default)(params) ? (0, _isArray2.default)(deps) || (0, _isUndefined2.default)(deps) : (0, _isObject2.default)(params) ? !(0, _isArray2.default)(deps) : false;
-  }
-
-  function isValidType(type) {
-    return type == "class" || type == "factory" || type == "singleton";
-  }
-
-  function isValidValue(value, type) {
-    return type == "class" || type == "factory" ? (0, _isFunction2.default)(value) : type == "singleton";
-  }
-
-  /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Public ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+  let registry = new Map();
 
   function create(key, params) {
-    let creator = getCreator(key);
+    let entry = getEntry(key);
 
-    if (creator.type == "singleton") return creator.value;
+    if (entry.type === "service") return entry.value;
 
-    let finalParams = resolveDeps(creator.deps, params);
+    let finalParams = resolveDeps(entry.deps, params);
 
-    if (creator.type == "class") return new creator.value(...finalParams);
+    if (entry.type === "class") return new entry.value(...finalParams);
 
-    return creator.value(...finalParams);
+    return entry.value(...finalParams);
   }
 
-  function getCreator(key) {
+  function getEntry(key) {
     if (!isRegistered(key)) throw ReferenceError();
 
-    return creators.get(key.toLowerCase());
+    return registry.get(key.toLowerCase());
   }
 
   function isRegistered(key) {
     if (!isValidKey(key)) throw TypeError();
 
-    return creators.has(key.toLowerCase());
+    return registry.has(key.toLowerCase());
+  }
+
+  function locate(key, params) {
+    let entry = getEntry(key);
+
+    if (entry.type === "service") return entry.value;
+
+    let service = create(key, params);
+
+    registerService(key, service);
+
+    return service;
   }
 
   function register(value, deps) {
-    if (!(0, _isFunction2.default)(value)) throw TypeError();
-    if (!(0, _isString2.default)(value.name) || !value.name.length) throw TypeError();
+    if (!(0, _isFunction3.default)(value)) throw TypeError();
+    if (!(0, _isString3.default)(value.name) || !value.name.length) throw TypeError();
 
     if ((0, _miscUtils.isProbablyClass)(value)) registerClass(value.name, value, deps);else registerFactory(value.name, value, deps);
   }
 
   function registerClass(key, classFn, deps) {
-    setCreator("class", key, classFn, deps);
+    setEntry("class", key, classFn, deps);
   }
 
   function registerFactory(key, factoryFn, deps) {
-    setCreator("factory", key, factoryFn, deps);
+    setEntry("factory", key, factoryFn, deps);
   }
 
-  function registerSingleton(key, singleton) {
-    setCreator("singleton", key, singleton);
+  function registerService(key, service) {
+    setEntry("service", key, service);
   }
 
   // Room for minor performance gains here by using a different algorithm for
@@ -117,35 +125,36 @@ function createFactory() {
   function resolveDeps(deps, params) {
     if (!isValidParams(params, deps)) throw TypeError();
 
-    let finalParams = (0, _isArray2.default)(deps) || (0, _isArray2.default)(params) ? [] : {};
+    let finalParams = (0, _isArray3.default)(deps) || (0, _isArray3.default)(params) ? [] : {};
 
-    (0, _forEach2.default)((0, _miscUtils.keysUnion)(deps, params), i => {
-      finalParams[i] = (0, _has2.default)(params, i) && params[i] != DEFER ? params[i] : (0, _has2.default)(deps, i) ? create(deps[i]) : undefined;
+    (0, _forEach3.default)((0, _miscUtils.keysUnion)(deps, params), i => {
+      finalParams[i] = (0, _has3.default)(params, i) && params[i] !== DEFER ? params[i] : (0, _has3.default)(deps, i) ? create(deps[i]) : undefined;
     });
 
     // Wrapping finalParams in an array if it's a non-array object lets us use
     // same "...finalParams" syntax for both positional and named parameters.
-    return (0, _isArray2.default)(finalParams) ? finalParams : [finalParams];
+    return (0, _isArray3.default)(finalParams) ? finalParams : [finalParams];
   }
 
-  function setCreator(type, key, value, deps) {
+  function setEntry(type, key, value, deps) {
     if (!isValidType(type)) throw TypeError();
     if (!isValidKey(key)) throw TypeError();
     if (!isValidValue(value, type)) throw TypeError();
     if (!isValidDeps(deps)) throw TypeError();
 
-    creators.set(key.toLowerCase(), { type, value, deps });
+    registry.set(key.toLowerCase(), { type, value, deps });
   }
 
   return {
     create,
     DEFER,
-    getCreator,
+    getEntry,
     isRegistered,
+    locate,
     register,
     registerClass,
     registerFactory,
-    registerSingleton,
-    setCreator
+    registerService,
+    setEntry
   };
 }
