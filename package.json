@@ -1,6 +1,6 @@
 {
   "name": "factory-tt",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "object creator and dependency manager",
   "author": "Grant Snodgrass <meeber@gametypething.com>",
   "license": "MIT",
