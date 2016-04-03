@@ -22,11 +22,13 @@
     "chai": "^3.5.0",
     "eslint": "^2.6.0",
     "eslint-config-tt": "^1.0.0",
+    "istanbul": "^1.0.0-alpha.2",
     "mocha": "^2.4.5"
   },
   "scripts": {
     "build": "npm run clean && babel -d dist/ src/",
     "clean": "rm -R -f dist/ && mkdir dist",
+    "coverage": "istanbul cover _mocha -- --require babel-core/register",
     "lint": "eslint --fix .",
     "postversion": "git checkout dev && git merge master && git push && git push --tags && npm publish",
     "preversion": "git checkout master && git merge dev && npm test",
