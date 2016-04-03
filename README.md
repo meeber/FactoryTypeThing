@@ -1,3 +1,6 @@
+[![build status](https://img.shields.io/travis/meeber/factory-type-thing.svg)](https://travis-ci.org/meeber/factory-type-thing)
+[![npm version](https://img.shields.io/npm/v/factory-tt.svg)](https://www.npmjs.com/package/factory-tt)
+
 # FactoryTypeThing
 
 JavaScript object creator and dependency manager.
