@@ -47,11 +47,7 @@ function isProbablyClass(value) {
   return (0, _isFunction3.default)(value) && startsUppercase(value.name);
 }
 
-function keysUnion() {
-  for (var _len = arguments.length, objects = Array(_len), _key = 0; _key < _len; _key++) {
-    objects[_key] = arguments[_key];
-  }
-
+function keysUnion(...objects) {
   return (0, _union3.default)((0, _flatMap3.default)(objects, obj => (0, _keys3.default)(obj)));
 }
 
