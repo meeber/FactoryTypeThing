@@ -7,7 +7,7 @@
   "repository": "meeber/factory-type-thing",
   "main": "dist/factory.js",
   "engines": {
-    "node": ">=5.0.0"
+    "node": ">=6.0.0"
   },
   "dependencies": {
     "lodash": "^4.7.0"
@@ -16,9 +16,7 @@
     "babel-cli": "^6.6.5",
     "babel-core": "^6.7.4",
     "babel-plugin-lodash": "^2.2.1",
-    "babel-plugin-transform-es2015-destructuring": "^6.6.5",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.7.4",
-    "babel-plugin-transform-es2015-parameters": "^6.7.0",
     "chai": "^3.5.0",
     "coveralls": "^2.11.9",
     "eslint": "^2.6.0",
